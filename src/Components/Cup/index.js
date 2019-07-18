@@ -7,16 +7,19 @@ const CupStyled = styled.div`
   width: 200px;
   position: fixed;
   z-index: 5;
-  left: ${({ x }) => `calc(${x * 20 + 30}% - 100px)`};
-  top: calc(50vh - 100px);
+  left: ${({ x }) => x};
+  top: ${({ y }) => y};
   img {
     transform: rotate(180deg);
   }
 `;
 
 export default function Cup({ x, cupId }) {
+  const calcLeft = () => `calc(${x * 20 + 30}% - 100px)`;
+  const calcTop = () => `calc(${Math.sin(x % 1) * 5 + 50}% - 100px)`;
+
   return (
-    <CupStyled x={x} id={`cup${cupId}`}>
+    <CupStyled x={calcLeft()} y={calcTop()} id={`cup${cupId}`}>
       <img src={cupImg} alt="cup" />
     </CupStyled>
   );

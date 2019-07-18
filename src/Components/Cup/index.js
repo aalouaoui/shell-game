@@ -15,11 +15,12 @@ const CupStyled = styled.div`
 `;
 
 export default function Cup({ x, cupId }) {
+  x = parseInt(x);
   const calcLeft = () => `calc(${x * 20 + 30}% - 100px)`;
   const calcTop = () => `calc(${Math.sin(x % 1) * 5 + 50}% - 100px)`;
 
   return (
-    <CupStyled x={calcLeft()} y={calcTop()} id={`cup${cupId}`}>
+    <CupStyled x={calcLeft()} y={calcTop()} id={cupId}>
       <img src={cupImg} alt="cup" />
     </CupStyled>
   );

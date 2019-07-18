@@ -15,7 +15,7 @@ const Cont = styled.div`
 `;
 
 export default function Container() {
-  let [cupsState, setCupsState] = useState([2, 0, 1]);
+  let [cupsState, setCupsState] = useState({ cup0: 0, cup1: 1, cup2: 2 });
   const [time, setTime] = useState(0);
   const [count, setCount] = useState(0);
 
@@ -25,10 +25,10 @@ export default function Container() {
     }, 1000);
 
     if (count < 10) {
-      let cupsCopy = [...cupsState];
-      let c1 = Math.floor(Math.random() * cupsCopy.length);
-      let c2 = Math.floor(Math.random() * cupsCopy.length);
-      while (c1 === c2) c2 = Math.floor(Math.random() * cupsCopy.length);
+      let cupsCopy = { ...cupsState };
+      let c1 = "cup" + Math.floor(Math.random() * 3);
+      let c2 = "cup" + Math.floor(Math.random() * 3);
+      while (c1 === c2) c2 = "cup" + Math.floor(Math.random() * 3);
       [cupsCopy[c1], cupsCopy[c2]] = [cupsCopy[c2], cupsCopy[c1]];
       setCupsState(cupsCopy);
       setCount(count + 1);
@@ -40,11 +40,12 @@ export default function Container() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [time]);
 
+  const ballVisiblity = count > 10 || count === 0 ? 1 : 0;
   return (
     <Cont>
-      <Ball visible="1" position={cupsState[1]} />
-      {cupsState.map((val, key) => (
-        <Cup x={val} cupId={key} key={key} />
+      <Ball visible={ballVisiblity} position={cupsState.cup1} />
+      {Object.keys(cupsState).map(val => (
+        <Cup x={cupsState[val]} cupId={val} key={val} />
       ))}
     </Cont>
   );

@@ -7,16 +7,16 @@ const CupStyled = styled.div`
   width: 200px;
   position: fixed;
   z-index: 5;
-  left: ${props => `calc(${props.x}% - 100px)`};
+  left: ${({ x }) => `calc(${x * 20 + 30}% - 100px)`};
   top: calc(50vh - 100px);
   img {
     transform: rotate(180deg);
   }
 `;
 
-export default function Cup(props) {
+export default function Cup({ x, cupId }) {
   return (
-    <CupStyled {...props}>
+    <CupStyled x={x} id={`cup${cupId}`}>
       <img src={cupImg} alt="cup" />
     </CupStyled>
   );

@@ -11,3 +11,15 @@ body {
   height: 100vh;
   background: url("https://source.unsplash.com/1600x900/?patterns,textures");
 }
+
+#cup0 {
+  background: #f00;
+}
+
+#cup1 {
+  background: #1faced;
+}
+
+#cup2 {
+  background: #1fa;
+}

@@ -18,21 +18,57 @@ class Container extends Component {
     cups: [
       {
         cupId: "cup0",
-        x: 0
+        x: 0,
+        lifted: 0
       },
       {
         cupId: "cup1",
-        x: 100
+        x: 100,
+        lifted: 0
       },
       {
         cupId: "cup2",
-        x: 200
+        x: 200,
+        lifted: 0
       }
     ],
     ballVisible: true
   };
 
-  componentDidMount() {}
+  liftCup = async cupId => {
+    let cups = [...this.state.cups];
+    for (let i = 0; i < 16; i++) {
+      cups[cupId].lifted = i;
+      await this.setState({ cups });
+      await this.timeout(10);
+    }
+    return true;
+  };
+
+  raiseCup = async cupId => {
+    let cups = [...this.state.cups];
+    for (let i = 15; i >= 0; i--) {
+      cups[cupId].lifted = i;
+      await this.setState({ cups });
+      await this.timeout(10);
+    }
+    return true;
+  };
+
+  async componentDidMount() {
+    await this.liftCup(1);
+    await this.timeout(1000);
+    await this.raiseCup(1);
+    await this.timeout(1000);
+
+    let promises = [this.moveCup(100, 200, 1), this.moveCup(200, 100, 2)]
+    await Promise.all(promises);
+    
+    await this.timeout(2000);
+    promises = [this.moveCup(0, 200, 0), this.moveCup(200, 0, 1)]
+    await Promise.all(promises);
+    
+  }
 
   timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -68,13 +104,7 @@ class Container extends Component {
   render() {
     return (
       <Cont>
-        <div
-          id="game-container"
-          onClick={() => {
-            this.moveCup(100, 200, 1);
-            this.moveCup(200, 100, 2);
-          }}
-        >
+        <div id="game-container">
           <Ball visible={this.state.ballVisible} x={this.state.cups[1].x} />
           {this.state.cups.map(cup => (
             <Cup {...cup} key={cup.cupId} />

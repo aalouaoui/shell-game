@@ -2,10 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import ballImg from "Assets/ball3.svg";
 
-const BallStyled = styled.div.attrs(({ visible, x }) => ({
+const BallStyled = styled.div.attrs(({ visible, transform }) => ({
   style: {
     display: visible ? "block" : "none",
-    transform: x
+    transform
   }
 }))`
   width: 60px;
@@ -19,7 +19,7 @@ export default function Ball({ visible, x }) {
   const getX = () => `translateX(${(x * 2.5) / 10}vw)`;
 
   return (
-    <BallStyled visible={visible} x={getX()}>
+    <BallStyled visible={visible} transform={getX()}>
       <img src={ballImg} alt="ball" />
     </BallStyled>
   );

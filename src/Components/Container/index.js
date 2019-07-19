@@ -34,24 +34,35 @@ class Container extends Component {
 
   componentDidMount() {}
 
-  moveCup = (oldVal, newVal, cupId) => {
+  timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  moveCup = async (oldVal, newVal, cupId) => {
     let i = oldVal;
-    const moveCycle = () => {
+    const moveCycle = async () => {
       i = oldVal < newVal ? i + 1 : i - 1;
       let cups = [...this.state.cups];
+      cups.forEach(cup => {
+        if (cup.x % 100 === 0) cup.z = 5;
+      });
       cups[cupId].x = i;
       cups[cupId].reverse = oldVal > newVal;
+      cups[cupId].z = oldVal > newVal ? 4 : 6;
       cups[cupId].factor = Math.abs(newVal - oldVal) > 100 ? 2 : 1;
-      this.setState({ cups, ballVisible: false }, () => {
-        if ((i < newVal && oldVal < newVal) || (i > newVal && oldVal > newVal))
-          setTimeout(() => moveCycle(), 1);
-        else {
-          cups[cupId].x = newVal;
-          setTimeout(() => this.setState({ cups, ballVisible: true }), 500);
-        }
-      });
+      await this.setState({ cups, ballVisible: false });
+
+      if ((i < newVal && oldVal < newVal) || (i > newVal && oldVal > newVal)) {
+        await this.timeout(1);
+        await moveCycle();
+      } else {
+        await this.timeout(500);
+        cups[cupId].x = newVal;
+        await this.setState({ cups, ballVisible: true });
+      }
+      return true;
     };
-    moveCycle();
+
+    await moveCycle();
+    return true;
   };
 
   render() {
@@ -60,8 +71,8 @@ class Container extends Component {
         <div
           id="game-container"
           onClick={() => {
-            this.moveCup(0, 200, 0);
-            this.moveCup(200, 0, 2);
+            this.moveCup(100, 200, 1);
+            this.moveCup(200, 100, 2);
           }}
         >
           <Ball visible={this.state.ballVisible} x={this.state.cups[1].x} />

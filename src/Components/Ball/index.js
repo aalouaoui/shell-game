@@ -12,11 +12,11 @@ const BallStyled = styled.div.attrs(({ visible, x }) => ({
   position: fixed;
   z-index: 199;
   top: calc(50vh + 30px);
-  left: calc(30vw - 30px);
+  left: calc(25vw - 30px);
 `;
 
 export default function Ball({ visible, x }) {
-  const getX = () => `translateX(${x / 5}vw)`;
+  const getX = () => `translateX(${(x * 2.5) / 10}vw)`;
 
   return (
     <BallStyled visible={visible} x={getX()}>

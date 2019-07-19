@@ -17,6 +17,10 @@ const CupStyled = styled.div.attrs(({ transform, z, top }) => ({
   img {
     transform: rotate(180deg);
   }
+  @media (max-width: 900px) {
+    width: 100px;
+    left: calc(20vw - 50px);
+  }
 `;
 
 export default function Cup({
@@ -29,16 +33,20 @@ export default function Cup({
   click
 }) {
   x = parseInt(x);
-  const calcLeft = () => `${(x * 2.5) / 10}vw`;
+  const m = window.innerWidth < 900 ? 3 : 2.5;
+  const calcLeft = () => `${(x * m) / 10}vw`;
   const calcTop = () => {
     let newX = reverse ? -x : x;
-    let val = Math.sin((newX * Math.PI) / 100 / factor) * 25;
+    let val = Math.sin((newX * Math.PI) / 100 / factor) * m * 10;
     return `${val.toFixed(20)}vh`;
   };
   const transform = lifted
     ? `translateX(${calcLeft()})`
     : `translate(${calcLeft()},${calcTop()})`;
-  const top = `calc(${50 - lifted}vh - 100px)`;
+  const top =
+    window.innerWidth < 900
+      ? `calc(${50 - lifted}vh - 50px)`
+      : `calc(${50 - lifted}vh - 100px)`;
 
   return (
     <CupStyled

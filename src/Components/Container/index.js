@@ -2,13 +2,14 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import Cup from "Components/Cup";
 import Ball from "Components/Ball";
+import StartScreen from "Components/StartScreen";
 
 const Cont = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: transparent;
   width: 100vw;
   height: 100vh;
 `;
@@ -55,27 +56,21 @@ class Container extends Component {
     return true;
   };
 
-  async componentDidMount() {
+  startGame = async () => {
+    await this.setState({ gameMode: 1 });
     await this.liftCup(1);
     return true;
-  }
+  };
 
-  startGame = async () => {
-    if (this.state.gameMode === 0) {
-      await this.setState({ gameMode: 1 });
-      await this.raiseCup(1);
-      await this.timeout(100);
-
-      for (let i = 0; i < 10; i++) {
-        let c1 = Math.floor(Math.random() * 3);
-        let c2 = Math.floor(Math.random() * 3);
-        while (c1 === c2) c2 = Math.floor(Math.random() * 3);
-        await this.swapCups(c1, c2);
-      }
-
-      await this.setState({ gameMode: 2 });
+  shuffleSequence = async () => {
+    await this.raiseCup(1);
+    for (let i = 0; i < 10; i++) {
+      let c1 = Math.floor(Math.random() * 3);
+      let c2 = Math.floor(Math.random() * 3);
+      while (c1 === c2) c2 = Math.floor(Math.random() * 3);
+      await this.swapCups(c1, c2);
     }
-
+    await this.setState({ gameMode: 2 });
     return true;
   };
 
@@ -119,11 +114,18 @@ class Container extends Component {
   };
 
   render() {
+    if (this.state.gameMode === 0)
+      return (
+        <Cont>
+          <StartScreen click={this.startGame} />
+        </Cont>
+      );
+
     return (
       <Cont>
-        <div id="game-container" onClick={this.startGame}>
+        <div id="game-container">
           <Ball
-            visible={[0, 2].includes(this.state.gameMode)}
+            visible={[1, 3].includes(this.state.gameMode)}
             x={this.state.cups[1].x}
           />
           {this.state.cups.map(cup => (

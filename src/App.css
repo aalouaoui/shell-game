@@ -1,15 +1,24 @@
+@import url("https://fonts.googleapis.com/css?family=Lobster&display=swap");
+
 * {
   margin: 0;
   padding: 0;
   vertical-align: middle;
   box-sizing: border-box;
   transition: all 0.3s ease-in-out 0s;
+  font-family: "Lobster", cursive;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   width: 100vw;
   height: 100vh;
-  background: url("https://source.unsplash.com/1600x900/?patterns,textures");
+}
+#start-screen span b,
+body {
+  background-image: url("https://source.unsplash.com/1600x900/?patterns,textures,dark");
+  background-size: 1600px 900px;
+  background-position: center;
 }
 
 #cup0 {

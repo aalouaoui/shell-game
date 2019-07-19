@@ -15,6 +15,7 @@ const Cont = styled.div`
 
 class Container extends Component {
   state = {
+    gameMode: 0,
     cups: [
       {
         cupId: "cup0",
@@ -57,25 +58,35 @@ class Container extends Component {
 
   async componentDidMount() {
     await this.liftCup(1);
-    await this.timeout(1000);
-    await this.raiseCup(1);
-    await this.timeout(1000);
-
-    let promises = [this.moveCup(100, 200, 1), this.moveCup(200, 100, 2)]
-    await Promise.all(promises);
-    
-    await this.timeout(2000);
-    promises = [this.moveCup(0, 200, 0), this.moveCup(200, 0, 1)]
-    await Promise.all(promises);
-    
+    return true;
   }
+
+  startGame = async () => {
+    await this.raiseCup(1);
+    await this.timeout(100);
+
+    for (let i = 0; i < 10; i++) {
+      let c1 = Math.floor(Math.random() * 3);
+      let c2 = Math.floor(Math.random() * 3);
+      while (c1 === c2) c2 = Math.floor(Math.random() * 3);
+      await this.swapCups(c1, c2);
+    }
+
+    return true;
+  };
+  swapCups = async (cup1, cup2) => {
+    let x1 = this.state.cups[cup1].x;
+    let x2 = this.state.cups[cup2].x;
+    let promises = [this.moveCup(x1, x2, cup1), this.moveCup(x2, x1, cup2)];
+    return await Promise.all(promises);
+  };
 
   timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   moveCup = async (oldVal, newVal, cupId) => {
     let i = oldVal;
     const moveCycle = async () => {
-      i = oldVal < newVal ? i + 1 : i - 1;
+      i = oldVal < newVal ? i + 2 : i - 2;
       let cups = [...this.state.cups];
       cups.forEach(cup => {
         if (cup.x % 100 === 0) cup.z = 5;
@@ -87,10 +98,10 @@ class Container extends Component {
       await this.setState({ cups, ballVisible: false });
 
       if ((i < newVal && oldVal < newVal) || (i > newVal && oldVal > newVal)) {
-        await this.timeout(1);
+        await this.timeout(2);
         await moveCycle();
       } else {
-        await this.timeout(500);
+        await this.timeout(2);
         cups[cupId].x = newVal;
         await this.setState({ cups, ballVisible: true });
       }
@@ -103,14 +114,14 @@ class Container extends Component {
 
   render() {
     return (
-      <Cont>
-        <div id="game-container">
+      <div>
+        <div id="game-container" onClick={this.startGame}>
           <Ball visible={this.state.ballVisible} x={this.state.cups[1].x} />
           {this.state.cups.map(cup => (
             <Cup {...cup} key={cup.cupId} />
           ))}
         </div>
-      </Cont>
+      </div>
     );
   }
 }

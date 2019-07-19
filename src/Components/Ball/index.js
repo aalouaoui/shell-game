@@ -10,7 +10,7 @@ const BallStyled = styled.div.attrs(({ visible, transform }) => ({
 }))`
   width: 60px;
   position: fixed;
-  z-index: 199;
+  z-index: 1;
   top: calc(50vh + 30px);
   left: calc(25vw - 30px);
 `;

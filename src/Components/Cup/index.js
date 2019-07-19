@@ -25,7 +25,8 @@ export default function Cup({
   cupId,
   reverse = false,
   factor = 1,
-  lifted
+  lifted,
+  click
 }) {
   x = parseInt(x);
   const calcLeft = () => `${(x * 2.5) / 10}vw`;
@@ -41,6 +42,7 @@ export default function Cup({
 
   return (
     <CupStyled
+      onClick={click}
       transform={transform}
       z={z}
       top={top}

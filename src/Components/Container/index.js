@@ -12,6 +12,16 @@ const Cont = styled.div`
   background: transparent;
   width: 100vw;
   height: 100vh;
+  .info {
+    display: block;
+    position: fixed;
+    top: 10px;
+    color: #fff;
+    width: 100%;
+    left: 0;
+    font-size: 4vh;
+    text-shadow: 0px 0px 2px #888;
+  }
 `;
 
 class Container extends Component {
@@ -36,7 +46,7 @@ class Container extends Component {
     ]
   };
 
-  liftCup = async cupId => {
+  raiseCup = async cupId => {
     let cups = [...this.state.cups];
     for (let i = 0; i < 16; i++) {
       cups[cupId].lifted = i;
@@ -46,7 +56,7 @@ class Container extends Component {
     return true;
   };
 
-  raiseCup = async cupId => {
+  lowerCup = async cupId => {
     let cups = [...this.state.cups];
     for (let i = 15; i >= 0; i--) {
       cups[cupId].lifted = i;
@@ -58,12 +68,11 @@ class Container extends Component {
 
   startGame = async () => {
     await this.setState({ gameMode: 1 });
-    await this.liftCup(1);
+    await this.raiseCup(1);
     return true;
   };
 
   shuffleSequence = async () => {
-    await this.raiseCup(1);
     for (let i = 0; i < 10; i++) {
       let c1 = Math.floor(Math.random() * 3);
       let c2 = Math.floor(Math.random() * 3);
@@ -113,6 +122,51 @@ class Container extends Component {
     return true;
   };
 
+  cupClick = async (ev, cupId) => {
+    const cupN = parseInt(cupId[3]);
+    if (this.state.gameMode === 1) {
+      await this.setState({ gameMode: 2 });
+      await this.lowerCup(1);
+      await this.timeout(100);
+      await this.shuffleSequence();
+      await this.setState({ gameMode: 3 });
+      return true;
+    }
+    if (this.state.gameMode === 3) {
+      await this.raiseCup(cupN);
+      let gameWon = cupN === 1 ? 1 : 0;
+      this.timeout(1000);
+      if (!gameWon) {
+        await this.timeout(1000);
+        await this.raiseCup(1);
+      }
+      await this.setState({ gameMode: 4 + gameWon });
+      return true;
+    }
+    if (this.state.gameMode > 3) {
+      await this.setState({
+        gameMode: 0,
+        cups: [
+          {
+            cupId: "cup0",
+            x: 0,
+            lifted: 0
+          },
+          {
+            cupId: "cup1",
+            x: 100,
+            lifted: 0
+          },
+          {
+            cupId: "cup2",
+            x: 200,
+            lifted: 0
+          }
+        ]
+      });
+    }
+  };
+
   render() {
     if (this.state.gameMode === 0)
       return (
@@ -124,13 +178,25 @@ class Container extends Component {
     return (
       <Cont>
         <div id="game-container">
-          <Ball
-            visible={[1, 3].includes(this.state.gameMode)}
-            x={this.state.cups[1].x}
-          />
+          <Ball visible={this.state.gameMode !== 2} x={this.state.cups[1].x} />
           {this.state.cups.map(cup => (
-            <Cup {...cup} key={cup.cupId} />
+            <Cup
+              {...cup}
+              key={cup.cupId}
+              click={ev => this.cupClick(ev, cup.cupId)}
+            />
           ))}
+          <span className="info">
+            {this.state.gameMode === 1
+              ? "Press any cup to start."
+              : this.state.gameMode === 3
+              ? "Where is the ball?"
+              : this.state.gameMode === 4
+              ? "Game Lost. Press any cup to restart"
+              : this.state.gameMode === 5
+              ? "Game Won. Press any cup to restart"
+              : null}
+          </span>
         </div>
       </Cont>
     );

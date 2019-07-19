@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { Component } from "react";
 import styled from "styled-components";
-// import Anime from "animejs";
 import Cup from "Components/Cup";
-import Ball from "../Ball";
+import Ball from "Components/Ball";
 
 const Cont = styled.div`
   display: flex;
@@ -14,39 +13,65 @@ const Cont = styled.div`
   height: 100vh;
 `;
 
-export default function Container() {
-  let [cupsState, setCupsState] = useState({ cup0: 0, cup1: 1, cup2: 2 });
-  const [time, setTime] = useState(0);
-  const [count, setCount] = useState(0);
+class Container extends Component {
+  state = {
+    cups: [
+      {
+        cupId: "cup0",
+        x: 0
+      },
+      {
+        cupId: "cup1",
+        x: 100
+      },
+      {
+        cupId: "cup2",
+        x: 200
+      }
+    ],
+    ballVisible: true
+  };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTime(time + 1);
-    }, 1000);
+  componentDidMount() {}
 
-    if (count < 10) {
-      let cupsCopy = { ...cupsState };
-      let c1 = "cup" + Math.floor(Math.random() * 3);
-      let c2 = "cup" + Math.floor(Math.random() * 3);
-      while (c1 === c2) c2 = "cup" + Math.floor(Math.random() * 3);
-      [cupsCopy[c1], cupsCopy[c2]] = [cupsCopy[c2], cupsCopy[c1]];
-      setCupsState(cupsCopy);
-      setCount(count + 1);
-    }
-
-    return () => {
-      clearTimeout(timer);
+  moveCup = (oldVal, newVal, cupId) => {
+    let i = oldVal;
+    const moveCycle = () => {
+      i = oldVal < newVal ? i + 1 : i - 1;
+      let cups = [...this.state.cups];
+      cups[cupId].x = i;
+      cups[cupId].reverse = oldVal > newVal;
+      cups[cupId].factor = Math.abs(newVal - oldVal) > 100 ? 2 : 1;
+      this.setState({ cups, ballVisible: false }, () => {
+        if ((i < newVal && oldVal < newVal) || (i > newVal && oldVal > newVal))
+          setTimeout(() => moveCycle(), 1);
+        else {
+          cups[cupId].x = newVal;
+          setTimeout(() => this.setState({ cups, ballVisible: true }), 500);
+        }
+      });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time]);
+    moveCycle();
+  };
 
-  const ballVisiblity = count > 10 || count === 0 ? 1 : 0;
-  return (
-    <Cont>
-      <Ball visible={ballVisiblity} position={cupsState.cup1} />
-      {Object.keys(cupsState).map(val => (
-        <Cup x={cupsState[val]} cupId={val} key={val} />
-      ))}
-    </Cont>
-  );
+  render() {
+    return (
+      <Cont>
+        <div
+          id="game-container"
+          onClick={() => {
+            this.moveCup(0, 200, 0);
+            this.moveCup(200, 0, 2);
+          }}
+        >
+          <Ball visible={this.state.ballVisible} x={this.state.cups[1].x} />
+          {this.state.cups.map(cup => (
+            <Cup {...cup} key={cup.cupId} />
+          ))}
+        </div>
+      </Cont>
+    );
+  }
 }
+
+export default Container;
